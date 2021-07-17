@@ -1,5 +1,5 @@
 {
-  "name": "@joshwi/node-utils",
+  "name": "@jshwilliams/node-utils",
   "version": "1.0.0",
   "description": "Node.js utility functions",
   "main": "index.js",

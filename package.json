@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/joshwi/node-utils#readme",
   "dependencies": {
-    "neo4j-driver": "^4.3.1",
     "underscore": "^1.13.1"
   }
 }

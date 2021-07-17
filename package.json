@@ -1,0 +1,23 @@
+{
+  "name": "@joshwi/node-utils",
+  "version": "1.0.0",
+  "description": "Node.js utility functions",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshwi/node-utils.git"
+  },
+  "author": "Josh Williams",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/joshwi/node-utils/issues"
+  },
+  "homepage": "https://github.com/joshwi/node-utils#readme",
+  "dependencies": {
+    "neo4j-driver": "^4.3.1",
+    "underscore": "^1.13.1"
+  }
+}

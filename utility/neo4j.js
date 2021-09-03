@@ -123,4 +123,72 @@ async function getNode(driver, node, query, correlationID) {
     return output
 }
 
-module.exports = { connectionStatus, runCypher, runTransactions, getNode }
+async function postNode(driver, node, label, properties, correlationID) {
+
+    let date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
+
+    let cypher = `CREATE (n:${node} {label:"${label}"})`
+
+    Object.keys(properties).map(entry => {
+        cypher += ` SET n.${entry}="${properties[entry]}"`
+    })
+
+    console.log(cypher)
+
+    let output = await runCypher(driver, cypher, correlationID)
+    output = output.stats ? output.stats : output
+
+    date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+
+    return output
+}
+
+async function putNode(driver, node, label, properties, correlationID) {
+
+    let date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
+
+    let cypher = `MERGE (n:${node} {label:"${label}"})`
+
+    Object.keys(properties).map(entry => {
+        cypher += ` SET n.${entry}="${properties[entry]}"`
+    })
+
+    console.log(cypher)
+
+    let output = await runCypher(driver, cypher, correlationID)
+    output = output.stats ? output.stats : output
+
+    date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+
+    return output
+}
+
+async function deleteNode(driver, node, label, correlationID) {
+
+    let date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
+
+    let cypher = `MATCH (n:${node})`
+
+    if(label){
+        cypher += ` WHERE n.label="${label}" DELETE n`
+    }else{
+        cypher += ` DELETE n`
+    }
+
+    console.log(cypher)
+
+    let output = await runCypher(driver, cypher, correlationID)
+    output = output.stats ? output.stats : output
+
+    date = new Date().toISOString()
+    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+
+    return output
+}
+
+module.exports = { connectionStatus, runCypher, runTransactions, getNode, postNode, putNode, deleteNode }

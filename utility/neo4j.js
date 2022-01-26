@@ -14,8 +14,6 @@ async function connectionStatus(driver) {
 }
 
 async function runCypher(driver, cypher, correlationID) {
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] runCypher - Start`)
 
     const session = driver.session()
 
@@ -29,12 +27,12 @@ async function runCypher(driver, cypher, correlationID) {
                 return _.object(entry.keys, fields)
             })
             date = new Date().toISOString()
-            console.log(`[ ${date} ] [ ${correlationID} ] runCypher - Finish`)
+            console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: runCypher ] [ Records: ${records.length} ]`)
             let output = { records: records, stats: stats }
             return output
         } catch (error) {
             date = new Date().toISOString()
-            console.log(`[ ${date} ] [ ${correlationID} ] runCypher - ${error}`)
+            console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runCypher ] [ Error: ${error} ]`)
             return { error: { code: error.code, message: error.message } }
         }
     }
@@ -44,9 +42,6 @@ async function runCypher(driver, cypher, correlationID) {
 async function runTransactions(driver, commands, correlationID) {
 
     const session = driver.session()
-
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] runTransactions - Start`)
 
     let tx = session.beginTransaction()
 
@@ -61,10 +56,10 @@ async function runTransactions(driver, commands, correlationID) {
     if (status) {
         output = result.filter(x => x.error).shift()
         date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] [ runTransactions ] - Failed - ${output.error}`)
+        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runTransactions ] [ Error: ${output.error} ]`)
     } else {
         date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] runTransactions - Finish`)
+        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runTransactions ] [ Commands Completed: ${commands.length} ]`)
     }
 
     return output
@@ -72,9 +67,6 @@ async function runTransactions(driver, commands, correlationID) {
 }
 
 async function getNode(driver, node, query, correlationID) {
-
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] getNode - Start`)
 
     const session = driver.session()
 
@@ -113,20 +105,16 @@ async function getNode(driver, node, query, correlationID) {
         })
     }).catch(err => { 
         date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] getNode - Failed ${err}`)
+        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: getNode ] [ Error: ${err} ]`)
     }).then(() => { session.close(); return result; })
 
-
     date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] getNode - Finish`)
+    console.log(`[ ${date} ] [ ${correlationID} ] [ Function: getNode ] [ Nodes: ${output.length} ]`)
 
     return output
 }
 
 async function postNode(driver, node, label, properties, correlationID) {
-
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
 
     let cypher = `CREATE (n:${node} {label:"${label}"})`
 
@@ -134,21 +122,16 @@ async function postNode(driver, node, label, properties, correlationID) {
         cypher += ` SET n.${entry}="${properties[entry]}"`
     })
 
-    console.log(cypher)
-
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
     date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: postNode ] [ Label: ${label} ] [ Node: ${node} ] [ Properties Set: ${output && output.propertiesSet ? output.propertiesSet : 0 } ]`)
 
     return output
 }
 
 async function putNode(driver, node, label, properties, correlationID) {
-
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
 
     let cypher = `MERGE (n:${node} {label:"${label}"})`
 
@@ -156,21 +139,16 @@ async function putNode(driver, node, label, properties, correlationID) {
         cypher += ` SET n.${entry}="${properties[entry]}"`
     })
 
-    console.log(cypher)
-
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
     date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: putNode ] [ Label: ${label} ] [ Node: ${node} ] [ Properties Set: ${output && output.propertiesSet ? output.propertiesSet : 0 } ]`)
 
     return output
 }
 
 async function deleteNode(driver, node, label, correlationID) {
-
-    let date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Start`)
 
     let cypher = `MATCH (n:${node})`
 
@@ -180,13 +158,11 @@ async function deleteNode(driver, node, label, correlationID) {
         cypher += ` DELETE n`
     }
 
-    console.log(cypher)
-
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
     date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] postNode - Finish`)
+    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: deleteNode ] [ Label: ${label} ] [ Node: ${node} ]`)
 
     return output
 }

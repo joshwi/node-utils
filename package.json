@@ -1,6 +1,6 @@
 {
   "name": "@jshwilliams/node-utils",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Node.js utility functions",
   "main": "index.js",
   "scripts": {
@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/joshwi/node-utils#readme",
   "dependencies": {
+    "chalk": "^2.4.1",
+    "loglevel": "^1.8.0",
+    "loglevel-plugin-prefix": "^0.8.4",
     "underscore": "^1.13.1"
   }
 }

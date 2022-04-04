@@ -1,4 +1,6 @@
 const _ = require("underscore")
+const chalk = require("chalk")
+const {log} = require("./log")
 
 async function connectionStatus(driver) {
     let output = { message: `Neo4j Connection Status`, status: "Unknown" }
@@ -26,13 +28,11 @@ async function runCypher(driver, cypher, correlationID) {
                 let fields = entry._fields.map(index => { if (index && index.properties) { return index.properties } else { return index } })
                 return _.object(entry.keys, fields)
             })
-            date = new Date().toISOString()
-            console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: runCypher ] [ Records: ${records.length} ]`)
+            log.info(`${correlationID} ${chalk.cyan("function")}=runCypher ${chalk.cyan("status")}=success ${chalk.cyan("records")}=${records.length}`)
             let output = { records: records, stats: stats }
             return output
         } catch (error) {
-            date = new Date().toISOString()
-            console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runCypher ] [ Error: ${error} ]`)
+            log.error(`${correlationID} ${chalk.cyan("function")}=runCypher ${chalk.cyan("status")}=failed ${chalk.cyan("error")}=${error}`)
             return { error: { code: error.code, message: error.message } }
         }
     }
@@ -55,11 +55,10 @@ async function runTransactions(driver, commands, correlationID) {
 
     if (status) {
         output = result.filter(x => x.error).shift()
-        date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runTransactions ] [ Error: ${output.error} ]`)
+        log.error(`${correlationID} ${chalk.cyan("function")}=runTransactions ${chalk.cyan("status")}=failed ${chalk.cyan("error")}=${output.error}`)
     } else {
         date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: runTransactions ] [ Commands Completed: ${commands.length} ]`)
+        log.info(`${correlationID} ${chalk.cyan("function")}=runTransactions ${chalk.cyan("status")}=success ${chalk.cyan("commands")}=${commands.length}`)
     }
 
     return output
@@ -104,12 +103,10 @@ async function getNode(driver, node, query, correlationID) {
             }
         })
     }).catch(err => { 
-        date = new Date().toISOString()
-        console.log(`[ ${date} ] [ ${correlationID} ] [ Function: getNode ] [ Error: ${err} ]`)
+        log.info(`${correlationID} ${chalk.cyan("function")}=getNode ${chalk.cyan("status")}=failed ${chalk.cyan("error")}=${err}`)
     }).then(() => { session.close(); return result; })
 
-    date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] [ Function: getNode ] [ Nodes: ${output.length} ]`)
+    log.info(`${correlationID} ${chalk.cyan("function")}=getNode ${chalk.cyan("status")}=success ${chalk.cyan("nodes")}=${output.length}`)
 
     return output
 }
@@ -125,8 +122,7 @@ async function postNode(driver, node, label, properties, correlationID) {
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
-    date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: postNode ] [ Label: ${label} ] [ Node: ${node} ] [ Properties Set: ${output && output.propertiesSet ? output.propertiesSet : 0 } ]`)
+    log.info(`${correlationID} ${chalk.cyan("function")}=postNode ${chalk.cyan("status")}=success ${chalk.cyan("label")}=${label} ${chalk.cyan("node")}=${node} ${chalk.cyan("properties")}=${output && output.propertiesSet ? output.propertiesSet : 0 }`)
 
     return output
 }
@@ -142,8 +138,8 @@ async function putNode(driver, node, label, properties, correlationID) {
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
-    date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: putNode ] [ Label: ${label} ] [ Node: ${node} ] [ Properties Set: ${output && output.propertiesSet ? output.propertiesSet : 0 } ]`)
+    log.info(`${correlationID} ${chalk.cyan("function")}=putNode ${chalk.cyan("status")}=success ${chalk.cyan("label")}=${label} ${chalk.cyan("node")}=${node} ${chalk.cyan("properties")}=${output && output.propertiesSet ? output.propertiesSet : 0 }`)
+
 
     return output
 }
@@ -161,8 +157,8 @@ async function deleteNode(driver, node, label, correlationID) {
     let output = await runCypher(driver, cypher, correlationID)
     output = output.stats ? output.stats : output
 
-    date = new Date().toISOString()
-    console.log(`[ ${date} ] [ ${correlationID} ] [ Functions: deleteNode ] [ Label: ${label} ] [ Node: ${node} ]`)
+    log.info(`${correlationID} ${chalk.cyan("function")}=deleteNode ${chalk.cyan("status")}=success ${chalk.cyan("label")}=${label} ${chalk.cyan("node")}=${node}`)
+
 
     return output
 }
